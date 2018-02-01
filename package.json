@@ -1,0 +1,19 @@
+{
+  "name": "shoplist",
+  "version": "1.0.0",
+  "description": "SplitWise API base app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnonyXcali/ShopList.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AnonyXcali/ShopList/issues"
+  },
+  "homepage": "https://github.com/AnonyXcali/ShopList#readme"
+}
