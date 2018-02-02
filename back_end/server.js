@@ -2,36 +2,78 @@ const express = require('express')
 const bodyParser= require('body-parser')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
-var db;
+var dbConfig = require('../back_end/assets/javascript/db.js');
+var mongoose = require('mongoose');
+
+
+//PASSPORT
+
+var passport = require('passport');
+var expressSession = require('express-session');
+app.use(expressSession({secret: 'mySecretKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+//PASSPORT
 
 app.use(bodyParser.urlencoded({extended: true}))
+//app.set('view engine', 'jade');
 
-MongoClient.connect('mongodb://admin_s:agithasadA1@ds123658.mlab.com:23658/shop_list_database', (err, client) => {
-if(err) return console.log(err)
-db = client.db('shop_list_database')
+var flash = require('connect-flash');
+app.use(flash());
+
+// Initialize Passport
+var initPassport = require('./assets/javascript/passport/init');
+initPassport(passport);
+
+// MongoClient.connect(dbConfig.url, (err, client) => {
+// if(err) return console.log(err)
+// db = client.db('shop_list_database')
+mongoose.connect(dbConfig.url);
 app.listen(3000, function() {
         console.log('listening on 3000')
       })
     
-})
+// })
 
-  app.get('/', (req, res) => {
-    var cursor = db.collection('test_push').find().toArray(function(err, results) {
-        console.log(results)
-        // send HTML file populated with quotes here
-      })
-    res.send("hello world");
+var routes = require('./router/routes')(passport);
+app.use('/', routes);
 
-    // Note: __dirname is directory that contains the JavaScript source code. Try logging it and see what you get!
-    // Mine was '/Users/zellwk/Projects/demo-repos/crud-express-mongo' for this app.
-  })
+/// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
 
-  app.post('/test', (req, res) => {
-    db.collection('test_push').save(req.body, (err, result) => {
-        console.log(req.body);
-        if (err) return console.log(err)
+  // app.get('/', (req, res) => {
+  //   var cursor = db.collection('users').find().toArray(function(err, results) {
+  //       console.log(results)
+  //       // send HTML file populated with quotes here
+  //     })
+  //   res.send("hello world");
+
+  //   // Note: __dirname is directory that contains the JavaScript source code. Try logging it and see what you get!
+  //   // Mine was '/Users/zellwk/Projects/demo-repos/crud-express-mongo' for this app.
+  // })
+
+  // app.post('/sign_up', (req, res) => {
+  //   db.collection('users').save(req.body, (err, result) => {
+  //       console.log(req.body);
+  //       if (err) return console.log(err)
     
-        console.log('saved to database')
-        res.redirect('/')
-      })
-  })
+  //       console.log('saved to database')
+  //       res.redirect('/')
+  //     })
+  // })
+
+  // app.post('/login', (req, res) => {
+  //   db.collection('users').save(req.body, (err, result) => {
+  //       console.log(req.body);
+  //       if (err) return console.log(err)
+    
+  //       console.log('saved to database')
+  //       res.redirect('/')
+  //     })
+  // })
+  module.exports = app;
