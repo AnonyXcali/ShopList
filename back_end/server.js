@@ -16,8 +16,12 @@ app.listen(3000, function() {
 })
 
   app.get('/', (req, res) => {
-    console.log(__dirname);
+    var cursor = db.collection('test_push').find().toArray(function(err, results) {
+        console.log(results)
+        // send HTML file populated with quotes here
+      })
     res.send("hello world");
+
     // Note: __dirname is directory that contains the JavaScript source code. Try logging it and see what you get!
     // Mine was '/Users/zellwk/Projects/demo-repos/crud-express-mongo' for this app.
   })
