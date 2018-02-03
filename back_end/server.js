@@ -1,25 +1,38 @@
-const express = require('express')
-const bodyParser= require('body-parser')
-const app = express()
-const MongoClient = require('mongodb').MongoClient
-var dbConfig = require('../back_end/assets/javascript/db.js');
+var express = require('express');
+var path = require('path');
+var favicon = require('static-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+
+var dbConfig = require('./db/db');
 var mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
+// Connect to DB
+mongoose.connect(dbConfig.url);
 
+var app = express();
 
-//PASSPORT
+// view engine setup
+//app.set('views', path.join(__dirname, 'views'));
+//app.set('view engine', 'jade');
 
+app.use(favicon());
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Configuring Passport
 var passport = require('passport');
 var expressSession = require('express-session');
+// TODO - Why Do we need this key ?
 app.use(expressSession({secret: 'mySecretKey'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
-//PASSPORT
-
-app.use(bodyParser.urlencoded({extended: true}))
-//app.set('view engine', 'jade');
-
+ // Using the flash middleware provided by connect-flash to store messages in session
+ // and displaying in templates
 var flash = require('connect-flash');
 app.use(flash());
 
@@ -27,20 +40,7 @@ app.use(flash());
 var initPassport = require('./assets/javascript/passport/init');
 initPassport(passport);
 
-// MongoClient.connect(dbConfig.url, (err, client) => {
-// if(err) return console.log(err)
-// db = client.db('shop_list_database')
-mongoose.connect(dbConfig.url)
-  .then(() =>  app.listen(3000, () => {
-    console.log('listening on 3000')
-  }))
-  .catch((err) => console.error(err));
-
-  
-    
-// })
-
-var routes = require('./router/routes');
+var routes = require('./routes/index')(passport);
 app.use('/', routes);
 
 /// catch 404 and forward to error handler
@@ -50,34 +50,16 @@ app.use(function(req, res, next) {
     next(err);
 });
 
-  // app.get('/', (req, res) => {
-  //   var cursor = db.collection('users').find().toArray(function(err, results) {
-  //       console.log(results)
-  //       // send HTML file populated with quotes here
-  //     })
-  //   res.send("hello world");
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
 
-  //   // Note: __dirname is directory that contains the JavaScript source code. Try logging it and see what you get!
-  //   // Mine was '/Users/zellwk/Projects/demo-repos/crud-express-mongo' for this app.
-  // })
-
-  // app.post('/sign_up', (req, res) => {
-  //   db.collection('users').save(req.body, (err, result) => {
-  //       console.log(req.body);
-  //       if (err) return console.log(err)
-    
-  //       console.log('saved to database')
-  //       res.redirect('/')
-  //     })
-  // })
-
-  // app.post('/login', (req, res) => {
-  //   db.collection('users').save(req.body, (err, result) => {
-  //       console.log(req.body);
-  //       if (err) return console.log(err)
-    
-  //       console.log('saved to database')
-  //       res.redirect('/')
-  //     })
-  // })
-  module.exports = app;
+module.exports = app;
