@@ -4,6 +4,7 @@ const app = express()
 const MongoClient = require('mongodb').MongoClient
 var dbConfig = require('../back_end/assets/javascript/db.js');
 var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
 
 //PASSPORT
@@ -29,14 +30,17 @@ initPassport(passport);
 // MongoClient.connect(dbConfig.url, (err, client) => {
 // if(err) return console.log(err)
 // db = client.db('shop_list_database')
-mongoose.connect(dbConfig.url);
-app.listen(3000, function() {
-        console.log('listening on 3000')
-      })
+mongoose.connect(dbConfig.url)
+  .then(() =>  app.listen(3000, () => {
+    console.log('listening on 3000')
+  }))
+  .catch((err) => console.error(err));
+
+  
     
 // })
 
-var routes = require('./router/routes')(passport);
+var routes = require('./router/routes');
 app.use('/', routes);
 
 /// catch 404 and forward to error handler
