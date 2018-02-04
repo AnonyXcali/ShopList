@@ -8,21 +8,24 @@ var bodyParser = require('body-parser');
 var dbConfig = require('./db/db');
 var mongoose = require('mongoose');
 // Connect to DB
-mongoose.connect(dbConfig.url);
+mongoose.Promise = global.Promise;
+mongoose.connect(dbConfig.url)
+  .then(() =>  console.log('connection succesful'))
+  .catch((err) => console.error(err));
 
 var app = express();
 
-// view engine setup
+//view engine setup
 //app.set('views', path.join(__dirname, 'views'));
-//app.set('view engine', 'jade');
+// app.set('view engine', 'jade');
 
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(express.static(path.join(__dirname, 'public')));
-
 // Configuring Passport
 var passport = require('passport');
 var expressSession = require('express-session');
@@ -55,7 +58,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.status('error', {
             message: err.message,
             error: err
         });

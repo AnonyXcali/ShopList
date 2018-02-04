@@ -16,7 +16,8 @@ module.exports = function(passport){
 	/* GET login page. */
 	router.get('/', function(req, res) {
     	// Display the Login page with any flash message, if any
-		res.render('index', { message: req.flash('message') });
+		//res.render('index', { message: req.flash('message') });
+		res.json({'status' : 'reached_init_one'})
 	});
 
 	/* Handle Login POST */
@@ -28,7 +29,12 @@ module.exports = function(passport){
 
 	/* GET Registration Page */
 	router.get('/signup', function(req, res){
-		res.render('register',{message: req.flash('message')});
+	
+		// res.render('register',{message: req.flash('message')});
+	//	res.json({'status' : 'reached_init_signup'});
+		res.send("user_created");
+		// res.end();
+
 	});
 
 	/* Handle Registration POST */
@@ -40,7 +46,10 @@ module.exports = function(passport){
 
 	/* GET Home Page */
 	router.get('/home', isAuthenticated, function(req, res){
-		res.render('home', { user: req.user });
+		// res.render('home', { user: req.user });
+		//res.json({'status' : 'home'})
+		res.send("hello worlsss");
+
 	});
 
 	/* Handle Logout */
