@@ -1,15 +1,18 @@
 var express = require('express');
 var router = express.Router();
+var userX = require('../models/user_model');
 
 var isAuthenticated = function (req, res, next) {
 	// if user is authenticated in the session, call the next() to call the next request handler 
 	// Passport adds this method to request object. A middleware is allowed to add properties to
 	// request and response objects
+	console.log('i was checked');
 	if (req.isAuthenticated())
 		return next();
 	// if the user is not authenticated then redirect him to the login page
 	res.redirect('/');
 }
+
 
 module.exports = function(passport){
 
@@ -29,7 +32,6 @@ module.exports = function(passport){
 
 	/* GET Registration Page */
 	router.get('/signup', function(req, res){
-	
 		// res.render('register',{message: req.flash('message')});
 	//	res.json({'status' : 'reached_init_signup'});
 		res.send("user_created");
@@ -38,17 +40,37 @@ module.exports = function(passport){
 	});
 
 	/* Handle Registration POST */
-	router.post('/signup', passport.authenticate('signup', {
-		successRedirect: '/home',
-		failureRedirect: '/signup',
-		failureFlash : true  
-	}));
+	// router.post('/signup', passport.authenticate('signup', {
+	// 	// successRedirect: '/home/:user',
+	// 	// failureRedirect: '/signup',
+	// 	failureFlash : true  
+	// },function(err , user , info){
+	// 	return res.redirect('/home/' + user.username);
+
+	// }
+	// ));
+
+
+	router.post('/signup', function(req, res, next) {
+		passport.authenticate('signup', {failureFlash:true}, function(err, user, info) {
+		 if (err) { return next(err); }
+		 if (!user) { return res.redirect('/'); }
+		req.logIn(user, function(err) {
+		  if (err) { return next(err); }
+		 return res.redirect('/home/' + user.username);
+	   });
+	  })(req, res, next);
+	  });
 
 	/* GET Home Page */
-	router.get('/home', isAuthenticated, function(req, res){
+	router.get('/home/:user', isAuthenticated, function(req, res){
 		// res.render('home', { user: req.user });
 		//res.json({'status' : 'home'})
-		res.send("hello worlsss");
+		req.params.user = req.user.username;
+		console.log(req.user.username);
+		res.send('hello ' + req.params.user + '!');
+		
+		//res.redirect(`/home/${req.user.username}`)
 
 	});
 
