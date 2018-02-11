@@ -39,18 +39,6 @@ module.exports = function(passport){
 
 	});
 
-	/* Handle Registration POST */
-	// router.post('/signup', passport.authenticate('signup', {
-	// 	// successRedirect: '/home/:user',
-	// 	// failureRedirect: '/signup',
-	// 	failureFlash : true  
-	// },function(err , user , info){
-	// 	return res.redirect('/home/' + user.username);
-
-	// }
-	// ));
-
-
 	router.post('/signup', function(req, res, next) {
 		passport.authenticate('signup', {failureFlash:true}, function(err, user, info) {
 		 if (err) { return next(err); }
