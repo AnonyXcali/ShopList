@@ -1,15 +1,18 @@
-var ObjectID = require('mongodb').ObjectID
+var uuid = require('uuid');
 
 var mongoose = require('mongoose');
- 
-module.exports = mongoose.model('List',{
-    // username: String,
-    // password: String,
-    // email: String,
-    // phone : Number,
-    primID : ObjectID,
-    username : String,
+var Schema = mongoose.Schema;
+var List = new Schema({
     listId : Number,
-    listname : String,
-    listobject : Array
+    listContent :[
+        {   
+            _id : Number,
+            itemName : String
+
+
+        }
+    ]
+
 });
+
+module.exports = mongoose.model('List',List);

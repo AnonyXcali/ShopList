@@ -44,8 +44,9 @@ var initPassport = require('./assets/javascript/passport/init');
 initPassport(passport);
 
 var routes = require('./routes/index')(passport);
-var list = require('./routes/listRoutes');
+var lists = require('./routes/lists');
 app.use('/', routes);
+app.use('/lists',lists);
 
 
 /// catch 404 and forward to error handler
